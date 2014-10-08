@@ -11,6 +11,12 @@ function($stateProvider, $urlRouteProvider) {
       controller: 'MainCtrl'
     });
     
+    .state('posts', {
+      url: '/posts/{id}',
+      templateUrl: '/posts.html',
+      controller: 'PostsCtrl'
+    });
+    
     $urlRouteProvider.otherwise('home');
 }])
 .factory('posts', [function(){
@@ -24,9 +30,9 @@ function($stateProvider, $urlRouteProvider) {
   'posts', 
   function($scope, posts) {
     $scope.test = 'Hello world!';
-    
+  
     $scope.posts = posts.posts;
-    
+  
     $scope.posts = [
       {title: 'post 1', upvotes: 5},
       {title: 'post 2', upvotes: 2},
@@ -37,9 +43,13 @@ function($stateProvider, $urlRouteProvider) {
     $scope.addPost = function() {
       if($scope.title === '') { return; }
       $scope.posts.push({
-        title: $scope.title, 
+        title: $scope.title,
+        link: $scope.link,
         upvotes: 0,
-        link: $scope.link
+        comments: [
+          {author: 'Joe', body: 'Cool post!', upvotes: 0},
+          {author: 'Bob', body: 'Great idea but everything is wrong!', upvotes: 0}
+        ]
       });
       $scope.title = '';
       $scope.link = '';
@@ -47,5 +57,24 @@ function($stateProvider, $urlRouteProvider) {
     $scope.incrementUpvotes = function(post) {
       post.upvotes += 1;
     };
+  }
+])
+.controller('PostsCtrl', [
+  '$scope',
+  '$stateParams',
+  'posts',
+  function($scope, $stateParams, posts){
+    $scope.post = posts.posts[$stateParams.id];
+    
+    $scope.addComment = function(){
+      if($scope.body === '') { return; }
+      $scope.post.comments.push({
+        body: $scope.body,
+        author: 'user',
+        upvotes: 0
+      });
+      $scope.body = '';
+    };
+    
   }
 ]);
